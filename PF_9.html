@@ -1,0 +1,1294 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Velocity Racing | High Performance Bike Racing</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Russo+One&display=swap" rel="stylesheet">
+	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        /* Reset and Base Styles */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --primary: #ff2a6d;
+            --secondary: #05d9e8;
+            --accent: #d1f7ff;
+            --dark: #0d0221;
+            --darker: #05010e;
+            --neon-glow: 0 0 10px rgba(5, 217, 232, 0.8), 0 0 20px rgba(5, 217, 232, 0.6), 0 0 30px rgba(5, 217, 232, 0.4);
+            --text-glow: 0 0 5px var(--accent), 0 0 10px rgba(209, 247, 255, 0.5);
+        }
+
+        body {
+            font-family: 'Orbitron', sans-serif;
+            background-color: var(--dark);
+            color: var(--accent);
+            overflow-x: hidden;
+            min-height: 100vh;
+            position: relative;
+        }
+
+        /* Loader Styles */
+        .loader-container {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: var(--darker);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            flex-direction: column;
+            z-index: 1000;
+            transition: opacity 0.8s ease-out, visibility 0.8s ease-out;
+        }
+
+        .loader {
+            position: relative;
+            width: 120px;
+            height: 120px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .pulse {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            background: radial-gradient(circle, var(--secondary) 0%, transparent 70%);
+            border-radius: 50%;
+            animation: pulse 2s infinite ease-out;
+            box-shadow: var(--neon-glow);
+            opacity: 0.8;
+        }
+
+        .pulse:nth-child(2) {
+            animation-delay: 0.4s;
+        }
+
+        .pulse:nth-child(3) {
+            animation-delay: 0.8s;
+        }
+
+        .center-orb {
+            width: 30px;
+            height: 30px;
+            background-color: var(--secondary);
+            border-radius: 50%;
+            box-shadow: 0 0 15px var(--secondary), 0 0 30px var(--secondary);
+            z-index: 10;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .loader-text {
+            margin-top: 40px;
+            font-size: 1.2rem;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            color: var(--accent);
+            text-shadow: var(--text-glow);
+            opacity: 0;
+            animation: fadeInOut 2s infinite;
+        }
+
+        @keyframes pulse {
+            0% {
+                transform: scale(0.8);
+                opacity: 0.8;
+            }
+            70% {
+                opacity: 0.3;
+            }
+            100% {
+                transform: scale(2.5);
+                opacity: 0;
+            }
+        }
+
+        @keyframes fadeInOut {
+            0%, 100% {
+                opacity: 0.3;
+            }
+            50% {
+                opacity: 1;
+            }
+        }
+
+        /* Main Content Styles */
+        .content {
+            opacity: 0;
+            transform: translateY(20px);
+            transition: opacity 0.8s ease-out, transform 0.8s ease-out;
+        }
+
+        .content.loaded {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        /* Header Styles */
+        header {
+            background: linear-gradient(to bottom, rgba(13, 2, 33, 0.9), rgba(13, 2, 33, 0.7));
+            backdrop-filter: blur(5px);
+            position: fixed;
+            width: 100%;
+            z-index: 100;
+            padding: 1rem 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid rgba(5, 217, 232, 0.2);
+        }
+
+        .logo {
+            font-family: 'Russo One', sans-serif;
+            font-size: 1.8rem;
+            color: var(--accent);
+            text-decoration: none;
+            text-shadow: var(--text-glow);
+            letter-spacing: 2px;
+        }
+
+        .logo span {
+            color: var(--secondary);
+        }
+
+        nav ul {
+            display: flex;
+            list-style: none;
+            gap: 2rem;
+        }
+
+        nav a {
+            color: var(--accent);
+            text-decoration: none;
+            font-weight: bold;
+            letter-spacing: 1px;
+            position: relative;
+            padding: 0.5rem 0;
+            transition: color 0.3s ease;
+        }
+
+        nav a:hover {
+            color: var(--secondary);
+        }
+
+        nav a::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 0;
+            height: 2px;
+            background-color: var(--secondary);
+            transition: width 0.3s ease;
+        }
+
+        nav a:hover::after {
+            width: 100%;
+        }
+
+        .mobile-menu-btn {
+            display: none;
+            background: none;
+            border: none;
+            color: var(--accent);
+            font-size: 1.5rem;
+            cursor: pointer;
+        }
+
+        /* Hero Section */
+        .hero {
+            height: 100vh;
+            background: url('https://images.pexels.com/photos/100582/pexels-photo-100582.jpeg') no-repeat center center;
+            background-size: cover;
+            position: relative;
+            display: flex;
+            align-items: center;
+            padding: 0 5%;
+            overflow: hidden;
+        }
+
+        .hero::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(to right, rgba(13, 2, 33, 0.9), rgba(13, 2, 33, 0.5));
+        }
+
+        .hero-content {
+            position: relative;
+            z-index: 1;
+            max-width: 600px;
+        }
+
+        .hero h1 {
+            font-family: 'Russo One', sans-serif;
+            font-size: 4rem;
+            margin-bottom: 1.5rem;
+            line-height: 1.1;
+            text-shadow: 0 0 10px rgba(255, 42, 109, 0.7);
+        }
+
+        .hero h1 span {
+            color: var(--primary);
+            display: block;
+        }
+
+        .hero p {
+            font-size: 1.2rem;
+            margin-bottom: 2rem;
+            line-height: 1.6;
+            text-shadow: 0 0 5px rgba(5, 217, 232, 0.5);
+        }
+
+        .btn {
+            display: inline-block;
+            padding: 0.8rem 2rem;
+            background: linear-gradient(45deg, var(--primary), var(--secondary));
+            color: var(--dark);
+            text-decoration: none;
+            font-weight: bold;
+            border-radius: 30px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            position: relative;
+            overflow: hidden;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            border: none;
+            cursor: pointer;
+            font-family: 'Orbitron', sans-serif;
+        }
+
+        .btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 20px rgba(255, 42, 109, 0.3), 0 0 20px rgba(5, 217, 232, 0.5);
+        }
+
+        .btn::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+            transition: left 0.7s ease;
+        }
+
+        .btn:hover::before {
+            left: 100%;
+        }
+
+        .spark-container {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            top: 0;
+            left: 0;
+            pointer-events: none;
+            overflow: hidden;
+            border-radius: 30px;
+        }
+
+        .spark {
+            position: absolute;
+            width: 5px;
+            height: 5px;
+            background-color: white;
+            border-radius: 50%;
+            opacity: 0;
+            transform: scale(0);
+        }
+
+        /* About Section */
+        .section {
+            padding: 6rem 5%;
+            position: relative;
+        }
+
+        .section-title {
+            font-family: 'Russo One', sans-serif;
+            font-size: 2.5rem;
+            margin-bottom: 3rem;
+            text-align: center;
+            position: relative;
+            display: inline-block;
+            left: 50%;
+            transform: translateX(-50%);
+        }
+
+        .section-title::after {
+            content: '';
+            position: absolute;
+            bottom: -10px;
+            left: 0;
+            width: 100%;
+            height: 3px;
+            background: linear-gradient(to right, var(--primary), var(--secondary));
+            border-radius: 3px;
+        }
+
+        .about-content {
+            display: flex;
+            align-items: center;
+            gap: 4rem;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .about-text {
+            flex: 1;
+        }
+
+        .about-text h3 {
+            font-size: 1.8rem;
+            margin-bottom: 1.5rem;
+            color: var(--secondary);
+        }
+
+        .about-text p {
+            margin-bottom: 1.5rem;
+            line-height: 1.7;
+        }
+
+        .about-image {
+            flex: 1;
+            position: relative;
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+        }
+
+        .about-image img {
+            width: 100%;
+            height: auto;
+            display: block;
+            transition: transform 0.5s ease;
+        }
+
+        .about-image:hover img {
+            transform: scale(1.05);
+        }
+
+        .about-image::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(45deg, rgba(255, 42, 109, 0.2), rgba(5, 217, 232, 0.2));
+            z-index: 1;
+        }
+
+        /* Bikes Section */
+        .bikes {
+            background: url('https://images.pexels.com/photos/1763067/pexels-photo-1763067.jpeg') no-repeat center center;
+            background-size: cover;
+            background-attachment: fixed;
+            position: relative;
+        }
+
+        .bikes::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(13, 2, 33, 0.85);
+        }
+
+        .bikes-container {
+            position: relative;
+            z-index: 1;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .bikes-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+            gap: 2rem;
+        }
+
+        .bike-card {
+            background: rgba(5, 1, 14, 0.7);
+            border-radius: 10px;
+            overflow: hidden;
+            transition: transform 0.5s ease, box-shadow 0.5s ease;
+            border: 1px solid rgba(5, 217, 232, 0.1);
+            backdrop-filter: blur(5px);
+        }
+
+        .bike-card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 15px 30px rgba(255, 42, 109, 0.2), 0 0 30px rgba(5, 217, 232, 0.3);
+        }
+
+        .bike-image {
+            height: 250px;
+            overflow: hidden;
+        }
+
+        .bike-image img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: transform 0.5s ease;
+        }
+
+        .bike-card:hover .bike-image img {
+            transform: scale(1.1);
+        }
+
+        .bike-info {
+            padding: 1.5rem;
+        }
+
+        .bike-info h3 {
+            font-size: 1.5rem;
+            margin-bottom: 0.5rem;
+            color: var(--secondary);
+        }
+
+        .bike-info .bike-specs {
+            display: flex;
+            gap: 1rem;
+            margin-bottom: 1rem;
+            font-size: 0.9rem;
+            color: var(--accent);
+            opacity: 0.8;
+        }
+
+        .bike-info .bike-specs span {
+            display: flex;
+            align-items: center;
+            gap: 0.3rem;
+        }
+
+        .bike-info .price {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: var(--primary);
+            margin-bottom: 1rem;
+        }
+
+        /* Team Section */
+        <!-- .team { -->
+            <!-- text-align: center; -->
+        <!-- } -->
+
+		.team {
+            background: no-repeat center center;
+            background-size: cover;
+            background-attachment: fixed;
+            position: relative;
+        }
+
+        .team::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(13, 2, 33, 0.85);
+        }
+		
+        .team-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+            gap: 2rem;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .team-member {
+            background: rgba(5, 1, 14, 0.7);
+            border-radius: 10px;
+            padding: 2rem;
+            transition: transform 0.5s ease, box-shadow 0.5s ease;
+            border: 1px solid rgba(5, 217, 232, 0.1);
+            backdrop-filter: blur(5px);
+        }
+
+        .team-member:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 10px 20px rgba(255, 42, 109, 0.2), 0 0 20px rgba(5, 217, 232, 0.3);
+        }
+
+        .member-image {
+            width: 150px;
+            height: 150px;
+            border-radius: 50%;
+            margin: 0 auto 1.5rem;
+            overflow: hidden;
+            border: 3px solid var(--secondary);
+            position: relative;
+        }
+
+        .member-image img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .team-member h3 {
+            font-size: 1.3rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .team-member .position {
+            color: var(--primary);
+            margin-bottom: 1rem;
+            font-weight: bold;
+        }
+
+        .social-links {
+			padding-top: 1.0rem;
+            display: flex;
+            justify-content: center;
+            gap: 1rem;
+        }
+
+        .social-links a {
+            color: var(--accent);
+            font-size: 1.2rem;
+            transition: color 0.3s ease, transform 0.3s ease;
+        }
+
+        .social-links a:hover {
+            color: var(--secondary);
+            transform: translateY(-3px);
+        }
+
+        /* Contact Section */
+        .contact {
+            background: url('https://images.pexels.com/photos/163872/race-motorsport-racing-f1-163872.jpeg') no-repeat center center;
+            background-size: cover;
+            position: relative;
+        }
+
+        .contact::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(13, 2, 33, 0.9);
+        }
+
+        .contact-container {
+            position: relative;
+            z-index: 1;
+            max-width: 1200px;
+            margin: 0 auto;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 3rem;
+        }
+
+        .contact-info {
+            display: flex;
+            flex-direction: column;
+            gap: 2rem;
+        }
+
+        .contact-item {
+            display: flex;
+            align-items: flex-start;
+            gap: 1rem;
+        }
+
+        .contact-icon {
+            font-size: 1.5rem;
+            color: var(--secondary);
+        }
+
+        .contact-text h3 {
+            font-size: 1.2rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .contact-text p, .contact-text a {
+            color: var(--accent);
+            text-decoration: none;
+            opacity: 0.8;
+            transition: opacity 0.3s ease;
+        }
+
+        .contact-text a:hover {
+            opacity: 1;
+            color: var(--secondary);
+        }
+
+        .contact-form {
+            background: rgba(5, 1, 14, 0.7);
+            padding: 2rem;
+            border-radius: 10px;
+            border: 1px solid rgba(5, 217, 232, 0.1);
+            backdrop-filter: blur(5px);
+        }
+
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: bold;
+        }
+
+        .form-group input,
+        .form-group textarea {
+            width: 100%;
+            padding: 0.8rem;
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(5, 217, 232, 0.3);
+            border-radius: 5px;
+            color: var(--accent);
+            font-family: 'Orbitron', sans-serif;
+            transition: border-color 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .form-group input:focus,
+        .form-group textarea:focus {
+            outline: none;
+            border-color: var(--secondary);
+            box-shadow: 0 0 10px rgba(5, 217, 232, 0.3);
+        }
+
+        .form-group textarea {
+            min-height: 150px;
+            resize: vertical;
+        }
+
+        /* Footer */
+        footer {
+            background: linear-gradient(to bottom, rgba(5, 1, 14, 1), rgba(13, 2, 33, 1));
+            padding: 3rem 5%;
+            text-align: center;
+            border-top: 1px solid rgba(5, 217, 232, 0.1);
+        }
+
+        .footer-logo {
+            font-family: 'Russo One', sans-serif;
+            font-size: 2rem;
+            margin-bottom: 1.5rem;
+            color: var(--accent);
+            text-shadow: var(--text-glow);
+            letter-spacing: 2px;
+        }
+
+        .footer-logo span {
+            color: var(--secondary);
+        }
+
+        .footer-links {
+            display: flex;
+            justify-content: center;
+            gap: 2rem;
+            margin-bottom: 2rem;
+            flex-wrap: wrap;
+        }
+
+        .footer-links a {
+            color: var(--accent);
+            text-decoration: none;
+            transition: color 0.3s ease;
+        }
+
+        .footer-links a:hover {
+            color: var(--secondary);
+        }
+
+        .social-links-footer {
+            display: flex;
+            justify-content: center;
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .social-links-footer a {
+            color: var(--accent);
+            font-size: 1.5rem;
+            transition: color 0.3s ease, transform 0.3s ease;
+        }
+
+        .social-links-footer a:hover {
+            color: var(--secondary);
+            transform: translateY(-3px);
+        }
+
+        .copyright {
+            opacity: 0.7;
+            font-size: 0.9rem;
+        }
+
+        /* Cursor Effects */
+        .cursor-trail {
+            position: fixed;
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            background: radial-gradient(circle, var(--secondary) 0%, transparent 70%);
+            pointer-events: none;
+            transform: translate(-50%, -50%);
+            mix-blend-mode: screen;
+            z-index: 9999;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        /* Animations */
+        @keyframes float {
+            0%, 100% {
+                transform: translateY(0);
+            }
+            50% {
+                transform: translateY(-10px);
+            }
+        }
+
+        .floating {
+            animation: float 3s ease-in-out infinite;
+        }
+
+        /* Responsive Styles */
+        @media (max-width: 992px) {
+            .about-content {
+                flex-direction: column;
+            }
+            
+            .hero h1 {
+                font-size: 3rem;
+            }
+        }
+
+        @media (max-width: 768px) {
+            nav ul {
+                position: fixed;
+                top: 80px;
+                left: -100%;
+                width: 100%;
+                height: calc(100vh - 80px);
+                background: var(--darker);
+                flex-direction: column;
+                align-items: center;
+                justify-content: center;
+                gap: 3rem;
+                transition: left 0.5s ease;
+            }
+
+            nav ul.active {
+                left: 0;
+            }
+
+            .mobile-menu-btn {
+                display: block;
+            }
+
+            .hero h1 {
+                font-size: 2.5rem;
+            }
+
+            .section-title {
+                font-size: 2rem;
+            }
+        }
+
+        @media (max-width: 576px) {
+            .hero h1 {
+                font-size: 2rem;
+            }
+
+            .hero p {
+                font-size: 1rem;
+            }
+
+            .btn {
+                padding: 0.6rem 1.5rem;
+                font-size: 0.9rem;
+            }
+
+            .section {
+                padding: 4rem 5%;
+            }
+
+            .bikes-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Loader -->
+    <div class="loader-container" id="loader">
+        <div class="loader">
+            <div class="pulse"></div>
+            <div class="pulse"></div>
+            <div class="pulse"></div>
+            <div class="center-orb" id="centerOrb"></div>
+        </div>
+        <div class="loader-text">START YOUR ENGINES</div>
+    </div>
+
+    <!-- Main Content -->
+    <div class="content" id="content">
+        <!-- Header -->
+        <header>
+            <a href="#" class="logo">VELOCITY<span>RACING</span></a>
+            <button class="mobile-menu-btn" id="mobileMenuBtn">☰</button>
+            <nav>
+                <ul id="navMenu">
+                    <li><a href="#home">Home</a></li>
+                    <li><a href="#about">About</a></li>
+                    <li><a href="#bikes">Bikes</a></li>
+                    <li><a href="#team">Team</a></li>
+                    <li><a href="#contact">Contact</a></li>
+                </ul>
+            </nav>
+        </header>
+
+        <!-- Hero Section -->
+        <section class="hero" id="home">
+            <div class="hero-content">
+                <h1>PUSH BEYOND <span>THE LIMITS</span></h1>
+                <p>Experience the thrill of high-performance bike racing with our state-of-the-art machines and professional racing team. Precision, speed, and adrenaline - that's what we're all about.</p>
+                <button class="btn" id="heroBtn">
+                    JOIN THE RACE
+                    <div class="spark-container" id="sparkContainer"></div>
+                </button>
+            </div>
+        </section>
+
+        <!-- About Section -->
+        <section class="section about" id="about">
+            <h2 class="section-title">ABOUT US</h2>
+            <div class="about-content">
+                <div class="about-text">
+                    <h3>Racing Excellence Since 2005</h3>
+                    <p>Velocity Racing was founded with one goal in mind: to push the boundaries of motorcycle racing performance. Our team of engineers, designers, and champion racers work together to create machines that dominate the track.</p>
+                    <p>With multiple championship titles under our belt, we've proven that our combination of cutting-edge technology and rider skill is unbeatable.</p>
+                    <p>Whether you're looking to join our racing team, purchase one of our high-performance bikes, or just experience the thrill of speed, Velocity Racing has something for you.</p>
+                    <a href="#contact" class="btn">GET IN TOUCH</a>
+                </div>
+                <div class="about-image floating">
+                    <img src="https://images.pexels.com/photos/5958027/pexels-photo-5958027.jpeg" alt="Racing bike in action">
+                </div>
+            </div>
+        </section>
+
+        <!-- Bikes Section -->
+        <section class="section bikes" id="bikes">
+            <h2 class="section-title">OUR BIKES</h2>
+            <div class="bikes-container">
+                <div class="bikes-grid">
+                    <div class="bike-card">
+                        <div class="bike-image">
+                            <img src="https://images.pexels.com/photos/2116475/pexels-photo-2116475.jpeg" alt="Vortex Racer X1">
+                        </div>
+                        <div class="bike-info">
+                            <h3>Vortex Racer X1</h3>
+                            <div class="bike-specs">
+                                <span>⚡ 1000cc</span>
+                                <span>🏁 210 mph</span>
+                                <span>⚙️ 6-speed</span>
+                            </div>
+                            <div class="price">$45,999</div>
+                            <button class="btn">VIEW DETAILS</button>
+                        </div>
+                    </div>
+                    <div class="bike-card">
+                        <div class="bike-image">
+                            <img src="https://images.pexels.com/photos/163210/motorcycles-race-helmets-pilots-163210.jpeg" alt="Phantom S2 Pro">
+                        </div>
+                        <div class="bike-info">
+                            <h3>Phantom S2 Pro</h3>
+                            <div class="bike-specs">
+                                <span>⚡ 1200cc</span>
+                                <span>🏁 225 mph</span>
+                                <span>⚙️ 6-speed</span>
+                            </div>
+                            <div class="price">$52,999</div>
+                            <button class="btn">VIEW DETAILS</button>
+                        </div>
+                    </div>
+                    <div class="bike-card">
+                        <div class="bike-image">
+                            <img src="https://images.pexels.com/photos/32645628/pexels-photo-32645628/free-photo-of-night-rider-stylish-woman-on-motorcycle.jpeg?auto=compress&cs=tinysrgb&w=600" alt="Neon Blitz R">
+                        </div>
+                        <div class="bike-info">
+                            <h3>Neon Blitz R</h3>
+                            <div class="bike-specs">
+                                <span>⚡ 800cc</span>
+                                <span>🏁 195 mph</span>
+                                <span>⚙️ 5-speed</span>
+                            </div>
+                            <div class="price">$38,999</div>
+                            <button class="btn">VIEW DETAILS</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Team Section -->
+        <section class="section team" id="team">
+            <h2 class="section-title">OUR TEAM</h2>
+            <div class="bikes-grid">
+                <div class="team-member">
+                    <div class="member-image">
+                        <img src="https://images.pexels.com/photos/614810/pexels-photo-614810.jpeg" alt="Alex Carter">
+                    </div>
+                    <h3>Alex Carter</h3>
+                    <div class="position">Lead Rider</div>
+                    <p>3-time national champion with over 50 race wins. Specializes in high-speed cornering and endurance racing.</p>
+                    <div class="social-links">
+                        <a href="#"><i class="fab fa-facebook-f"></i></a>
+						<a href="#"><i class="fab fa-instagram"></i></a>
+						<a href="#"><i class="fab fa-youtube"></i></a>
+                    </div>
+                </div>
+                <div class="team-member">
+                    <div class="member-image">
+                        <img src="https://images.pexels.com/photos/733872/pexels-photo-733872.jpeg" alt="Maria Rodriguez">
+                    </div>
+                    <h3>Maria Rodriguez</h3>
+                    <div class="position">Technical Director</div>
+                    <p>Former aerospace engineer who brings precision and innovation to our bike designs and performance tuning.</p>
+                    <div class="social-links">
+                        <a href="#"><i class="fab fa-facebook-f"></i></a>
+						<a href="#"><i class="fab fa-instagram"></i></a>
+						<a href="#"><i class="fab fa-youtube"></i></a>
+                    </div>
+                </div>
+                <div class="team-member">
+                    <div class="member-image">
+                        <img src="https://images.pexels.com/photos/1222271/pexels-photo-1222271.jpeg" alt="Jamie Chen">
+                    </div>
+                    <h3>Jamie Chen</h3>
+                    <div class="position">Head Mechanic</div>
+                    <p>20 years of experience in motorcycle mechanics. Knows every nut and bolt of our racing machines.</p>
+                    <div class="social-links">
+                        <a href="#"><i class="fab fa-facebook-f"></i></a>
+						<a href="#"><i class="fab fa-instagram"></i></a>
+						<a href="#"><i class="fab fa-youtube"></i></a>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Contact Section -->
+        <section class="section contact" id="contact">
+            <h2 class="section-title">CONTACT US</h2>
+            <div class="contact-container">
+                <div class="contact-info">
+                    <div class="contact-item">
+                        <div class="contact-icon">📍</div>
+                        <div class="contact-text">
+                            <h3>Address</h3>
+                            <p>123 Speedway Avenue<br>Racing City, RC 90210</p>
+                        </div>
+                    </div>
+                    <div class="contact-item">
+                        <div class="contact-icon">📞</div>
+                        <div class="contact-text">
+                            <h3>Phone</h3>
+                            <p><a href="tel:+18005551234">(800) 555-1234</a></p>
+                        </div>
+                    </div>
+                    <div class="contact-item">
+                        <div class="contact-icon">✉️</div>
+                        <div class="contact-text">
+                            <h3>Email</h3>
+                            <p><a href="mailto:info@velocityracing.com">info@velocityracing.com</a></p>
+                        </div>
+                    </div>
+                    <div class="contact-item">
+                        <div class="contact-icon">⏱️</div>
+                        <div class="contact-text">
+                            <h3>Hours</h3>
+                            <p>Monday - Friday: 9AM - 6PM<br>Saturday: 10AM - 4PM<br>Sunday: Closed</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="contact-form">
+                    <form id="contactForm">
+                        <div class="form-group">
+                            <label for="name">Name</label>
+                            <input type="text" id="name" name="name" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="email">Email</label>
+                            <input type="email" id="email" name="email" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="subject">Subject</label>
+                            <input type="text" id="subject" name="subject" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="message">Message</label>
+                            <textarea id="message" name="message" required></textarea>
+                        </div>
+                        <button type="submit" class="btn">SEND MESSAGE</button>
+                    </form>
+                </div>
+            </div>
+        </section>
+
+        <!-- Footer -->
+        <footer>
+            <div class="footer-logo">VELOCITY<span>RACING</span></div>
+            <div class="footer-links">
+                <a href="#home">Home</a>
+                <a href="#about">About</a>
+                <a href="#bikes">Bikes</a>
+                <a href="#team">Team</a>
+                <a href="#contact">Contact</a>
+                <a href="#">Privacy Policy</a>
+                <a href="#">Terms of Service</a>
+            </div>
+            <div class="social-links-footer">
+                <a href="#"><i class="fab fa-facebook-f"></i></a>
+                <a href="#"><i class="fab fa-instagram"></i></a>
+                <a href="#"><i class="fab fa-youtube"></i></a>
+                <a href="#"><i class="fab fa-linkedin-in"></i></a>
+            </div>
+            <div class="copyright">© 2023 Velocity Racing. All rights reserved.</div>
+        </footer>
+    </div>
+
+    <!-- Cursor Trail -->
+    <div class="cursor-trail" id="cursorTrail"></div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Loader animation
+            const loader = document.getElementById('loader');
+            const content = document.getElementById('content');
+            const centerOrb = document.getElementById('centerOrb');
+            const cursorTrail = document.getElementById('cursorTrail');
+            
+            // Mouse position variables
+            let mouseX = 0;
+            let mouseY = 0;
+            let lastMouseX = 0;
+            let lastMouseY = 0;
+            let mouseSpeed = 0;
+            
+            // Track mouse position
+            document.addEventListener('mousemove', (e) => {
+                mouseX = e.clientX;
+                mouseY = e.clientY;
+                
+                // Calculate mouse speed
+                const deltaX = mouseX - lastMouseX;
+                const deltaY = mouseY - lastMouseY;
+                mouseSpeed = Math.sqrt(deltaX * deltaX + deltaY * deltaY);
+                
+                lastMouseX = mouseX;
+                lastMouseY = mouseY;
+                
+                // Update cursor trail
+                cursorTrail.style.left = `${mouseX}px`;
+                cursorTrail.style.top = `${mouseY}px`;
+                cursorTrail.style.opacity = '0.7';
+                
+                // Adjust trail size based on speed
+                const trailSize = Math.min(30, 10 + mouseSpeed / 5);
+                cursorTrail.style.width = `${trailSize}px`;
+                cursorTrail.style.height = `${trailSize}px`;
+                
+                // Adjust loader orb based on mouse speed
+                if (centerOrb) {
+                    const scale = 1 + mouseSpeed / 200;
+                    centerOrb.style.transform = `scale(${scale})`;
+                    
+                    // Change color based on speed
+                    const hue = (mouseSpeed / 5) % 360;
+                    centerOrb.style.backgroundColor = `hsl(${hue}, 100%, 50%)`;
+                    centerOrb.style.boxShadow = `0 0 15px hsl(${hue}, 100%, 50%), 0 0 30px hsl(${hue}, 100%, 50%)`;
+                }
+            });
+            
+            // Hide cursor trail when mouse stops
+            let mouseStopTimer;
+            document.addEventListener('mousemove', () => {
+                cursorTrail.style.opacity = '0.7';
+                clearTimeout(mouseStopTimer);
+                mouseStopTimer = setTimeout(() => {
+                    cursorTrail.style.opacity = '0';
+                }, 100);
+            });
+            
+            // Simulate loading and transition to content
+            setTimeout(() => {
+                // Create exit animation for loader
+                loader.style.opacity = '0';
+                loader.style.visibility = 'hidden';
+                
+                // Show content with animation
+                content.classList.add('loaded');
+                
+                // Remove loader from DOM after transition
+                setTimeout(() => {
+                    loader.remove();
+                }, 1000);
+            }, 3000); // Adjust this timeout based on actual loading needs
+            
+            // Mobile menu toggle
+            const mobileMenuBtn = document.getElementById('mobileMenuBtn');
+            const navMenu = document.getElementById('navMenu');
+            
+            mobileMenuBtn.addEventListener('click', () => {
+                navMenu.classList.toggle('active');
+                mobileMenuBtn.textContent = navMenu.classList.contains('active') ? '✕' : '☰';
+            });
+            
+            // Close mobile menu when clicking a link
+            document.querySelectorAll('#navMenu a').forEach(link => {
+                link.addEventListener('click', () => {
+                    navMenu.classList.remove('active');
+                    mobileMenuBtn.textContent = '☰';
+                });
+            });
+            
+            // Button spark effects
+            const heroBtn = document.getElementById('heroBtn');
+            const sparkContainer = document.getElementById('sparkContainer');
+            
+            heroBtn.addEventListener('click', createSparks);
+            
+            function createSparks() {
+                // Clear previous sparks
+                sparkContainer.innerHTML = '';
+                
+                // Create multiple sparks
+                for (let i = 0; i < 20; i++) {
+                    const spark = document.createElement('div');
+                    spark.classList.add('spark');
+                    
+                    // Random position
+                    const x = Math.random() * 100;
+                    const y = Math.random() * 100;
+                    spark.style.left = `${x}%`;
+                    spark.style.top = `${y}%`;
+                    
+                    // Random color
+                    const hue = Math.random() * 360;
+                    spark.style.backgroundColor = `hsl(${hue}, 100%, 70%)`;
+                    
+                    // Random size
+                    const size = Math.random() * 3 + 2;
+                    spark.style.width = `${size}px`;
+                    spark.style.height = `${size}px`;
+                    
+                    sparkContainer.appendChild(spark);
+                    
+                    // Animate spark
+                    const angle = Math.random() * Math.PI * 2;
+                    const velocity = Math.random() * 5 + 5;
+                    const distance = Math.random() * 50 + 50;
+                    
+                    let currentDistance = 0;
+                    const animationDuration = Math.random() * 500 + 500;
+                    
+                    const animateSpark = () => {
+                        currentDistance += velocity;
+                        const newX = x + Math.cos(angle) * currentDistance / 2;
+                        const newY = y + Math.sin(angle) * currentDistance / 2;
+                        
+                        spark.style.left = `${newX}%`;
+                        spark.style.top = `${newY}%`;
+                        spark.style.opacity = 1 - (currentDistance / distance);
+                        spark.style.transform = `scale(${1 - (currentDistance / distance)})`;
+                        
+                        if (currentDistance < distance) {
+                            requestAnimationFrame(animateSpark);
+                        } else {
+                            spark.remove();
+                        }
+                    };
+                    
+                    setTimeout(() => {
+                        requestAnimationFrame(animateSpark);
+                    }, Math.random() * 100);
+                }
+            }
+            
+            // Form submission
+            const contactForm = document.getElementById('contactForm');
+            
+            contactForm.addEventListener('submit', (e) => {
+                e.preventDefault();
+                
+                // Get form values
+                const name = document.getElementById('name').value;
+                const email = document.getElementById('email').value;
+                const subject = document.getElementById('subject').value;
+                const message = document.getElementById('message').value;
+                
+                // Here you would typically send the form data to a server
+                console.log('Form submitted:', { name, email, subject, message });
+                
+                // Show success message
+                alert('Thank you for your message! We will get back to you soon.');
+                
+                // Reset form
+                contactForm.reset();
+            });
+            
+            // Smooth scrolling for anchor links
+            document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+                anchor.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    
+                    const targetId = this.getAttribute('href');
+                    const targetElement = document.querySelector(targetId);
+                    
+                    if (targetElement) {
+                        window.scrollTo({
+                            top: targetElement.offsetTop - 80,
+                            behavior: 'smooth'
+                        });
+                    }
+                });
+            });
+            
+            // Parallax effects
+            window.addEventListener('scroll', () => {
+                const scrollPosition = window.scrollY;
+                
+                // Hero section parallax
+                const hero = document.querySelector('.hero');
+                if (hero) {
+                    hero.style.backgroundPositionY = `${scrollPosition * 0.5}px`;
+                }
+                
+                // Floating elements
+                const floatingElements = document.querySelectorAll('.floating');
+                floatingElements.forEach(el => {
+                    el.style.transform = `translateY(${Math.sin(scrollPosition / 200) * 10}px)`;
+                });
+            });
+        });
+    </script>
+</body>
+</html>
